@@ -1,0 +1,85 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                 Int                 @id @default(autoincrement())
+  username           String              @unique
+  email              String?             @unique
+  password           String
+  createdAt          DateTime            @default(now())
+  status             String              @default("A verifier")
+  connectionHistory  ConnectionHistory[]
+  payments           Payment[]           // Relation avec les paiements liés à l'utilisateur
+  createdProjects    Project[]           // Relation avec les projets créés par l'utilisateur
+}
+
+model ConnectionHistory {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  dateTime  DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Credit {
+  id              Int       @id @default(autoincrement())
+  amount          Float     // Montant total du crédit
+  interestRate    Float     // Taux d'intérêt (% annuel)
+  fees            Float     // Frais de dossier
+  durationMonths  Int       // Durée en mois
+  startDate       DateTime  // Date de début du crédit
+  totalAmount     Float     // Montant total dû
+  monthlyPayment  Float     // Montant de l'échéance mensuelle
+  createdAt       DateTime  @default(now())
+  payments        Payment[] // Paiements associés à ce crédit
+}
+
+model Payment {
+  id         Int       @id @default(autoincrement())
+  creditId   Int       // Référence au crédit
+  userId     Int       // Référence au participant
+  amount     Float     // Montant de l'échéance
+  dueDate    DateTime  // Date de l'échéance
+  status     String    @default("Non payé") // Statut du paiement : "Non payé", "Payé", etc.
+  createdAt  DateTime  @default(now())
+  credit     Credit    @relation(fields: [creditId], references: [id], onDelete: Cascade)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Solde {
+  id          Int      @id @default(autoincrement())
+  amount      Float    // Montant en format numérique
+  source      String   // Source du solde (libellé ou origine)
+  addedAt     DateTime @default(now()) // Date d'ajout
+}
+
+model Project {
+  id          Int       @id @default(autoincrement())
+  projectName String    // Nom du projet
+  startDate   DateTime  // Date de début
+  endDate     DateTime  // Date de fin
+  studyAmount Float     // Somme d'étude
+  description String    // Description du projet
+  status      String    @default("En cours") // Statut par défaut
+  createdAt   DateTime  @default(now()) // Date de création du projet
+  createdById Int
+  createdBy   User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  expenses    Expense[]
+}
+
+model Expense {
+  id          Int       @id @default(autoincrement())
+  projectId   Int       // Référence au projet
+  description String    // Description de la dépense
+  unitPrice   Float     // Prix unitaire
+  quantity    Int       // Quantité
+  total       Float     // Total (calculé comme unitPrice * quantity)
+  createdAt   DateTime  @default(now()) // Date de création de la dépense
+  invoiceFile String?   // Chemin local ou URL du fichier de facture (facultatif)
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}

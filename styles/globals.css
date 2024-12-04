@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Reset de base et gestion des marges/paddings */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 100vh;
+    width: 100%;
+    background-color: #f7f7f7;
+    overflow-x: hidden; /* Pas de débordement horizontal */
+  }
+
+  /* Page principale contenant la navbar et le contenu */
+  .page-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow-x: hidden; /* Pour éviter les débordements horizontaux */
+  }
+
+  /* Navbar fixe en haut */
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px; /* Ajustez la hauteur de la navbar */
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 50;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 0 10px;
+  }
+
+  /* Contenu sous la navbar, avec défilement autorisé */
+  .content {
+    padding-top: 60px; /* Marge pour que le contenu ne se superpose pas avec la navbar */
+    flex-grow: 1;
+    overflow-y: auto; /* Permet le défilement vertical */
+  }
+
+  /* Styles responsive pour mobile */
+  @media (max-width: 640px) {
+    .navbar {
+      height: 50px;
+      padding: 0 5px;
+    }
+
+    .content {
+      padding: 0.5rem;
+    }
+  }
+
+  /* Styles pour les tablettes et les écrans plus larges */
+  @media (min-width: 641px) {
+    .navbar {
+      height: 70px;
+      padding: 0 20px;
+    }
+
+    .content {
+      padding: 2rem;
+    }
+  }
+}
+
+@layer utilities {
+  .full-screen {
+    min-height: 100vh;
+    width: 100%;
+  }
+
+  .no-overflow {
+    overflow-x: hidden;
+  }
+}
+
